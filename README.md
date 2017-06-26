@@ -1,7 +1,5 @@
-# felipe-diaz-back
-felipe-diaz-back
-
-Cube Sum Range Query webapp problem for Rappi interview process
+# Fernando Garcia
+Fernando Garcia Tovar
 
 ---
 run the project using
