@@ -1,10 +1,11 @@
-/**
- * Created by USER on 13/04/2017.
- */
+const databaseConfig= {
+  host: "localhost",
+  port: 5432,
+  database: "payutest",
+  user: "postgres"
+};
 
-
-
-
-var db = "database";
+const pgp = require("pg-promise")({});
+const db = pgp(databaseConfig);
 
 module.exports = db;

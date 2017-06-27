@@ -9,6 +9,7 @@
 "use strict";
 
 var InvoicesController = require('./InvoicesController');
+var ProductController = require('./ProductController');
 
 /**
  *Handle all the API requests 
@@ -19,6 +20,10 @@ function Controllers(app){
 
     //TODO
     app.post('/api/invoice', InvoicesController.createInvoice);
+
+    app.get('/api/invoice', InvoicesController.getInvoices);
+
+    app.get('/api/product', ProductController.getProducts);
 
   }
 

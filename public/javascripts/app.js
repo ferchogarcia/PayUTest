@@ -13,14 +13,10 @@
 
     ProductsController.$inject = ['$scope' , '$http'];
     function ProductsController($scope, $http) {
-        $scope.inventory = [{name:"Maestro Yoda",price:75000,currency:"COP$"},
-                            {name:"Sable laser de plástico",price:35,currency:"USD$"},
-                            {name:"Nave espacial Halcón Milenario",price:125000,currency:"COP$"},
-                            {name:"Estrella de la muerte",price:200,currency:"USD$"},
-                            {name:"R2D2 en fichas de Lego",price:450,currency:"MXN$"},
-                            {name:"Jar Jar Binks Gobernador",price:800,currency:"MXN$"}
-                            ];
+        $scope.inventory = [];
         $scope.products = [];
+
+        $scope.code = ""
         $scope.product = "";
         $scope.quantity = 1;
         $scope.value = 0;
@@ -28,30 +24,63 @@
 
         $scope.invoices = [];
         $scope.lastInvoice = null;
+
         
-        $scope.getPriceProductSelected = function(){
-            var product = $scope.inventory.find(function(productInventory){
-                return productInventory.name === $scope.product;
+
+        $scope.getProducts = function(){
+            $http.get('/api/product').
+            success(function(data, status, headers, config) {
+                console.log('recibiendo productos');
+                $scope.inventory = data;
+            }).
+            error(function(data, status, headers, config) {
+                console.log("Error " + data + " " + status);
             });
-            $scope.value = product.price;
-            $scope.currency = product.currency;
+        };
+        
+
+        $scope.getInvoices = function(){
+            $http.get('/api/invoice').
+            success(function(data, status, headers, config) {
+                console.log('recibiendo invoices');
+                $scope.invoices = data;
+            }).
+            error(function(data, status, headers, config) {
+                console.log("Error " + data + " " + status);
+            });   
+
         };
 
-        
+        $scope.loadData = function(){
+            $scope.getProducts();
+            $scope.getInvoices();
+        };
+        $scope.loadData();
 
-        $scope.message = "Usted no ha realizado ninguna compra aún";
+        
+        
+        $scope.getProductSelected = function(){
+            var product = $scope.inventory.find(function(productInventory){
+                return productInventory.Code === $scope.code;
+            });
+            $scope.value = product.Price;
+            $scope.currency = product.Currency;
+            $scope.product = product.Name;
+        };
+
         $scope.addProduct =  function(){
-            $scope.products.push(  {name: $scope.product, quantity: $scope.quantity , value: $scope.value , currency: $scope.currency});
+            $scope.products.push({code:$scope.code, name: $scope.product, quantity: $scope.quantity , value: $scope.value , currency: $scope.currency});
+            $scope.code = "";
             $scope.product = "";
             $scope.quantity = 1;
             $scope.value = 0;
             $scope.currency = "";
         };
 
-        
-        $scope.removeProduct =  function(productName){
+        $scope.removeProduct =  function(productCode){
+            console.log(productCode);
             for(var i = 0 ;  i < $scope.products.length; i++){
-                if(  $scope.products[i].name == productName){
+                if(  $scope.products[i].code == productCode){
                     $scope.products.splice(i, 1);
                 }
             }
@@ -60,22 +89,23 @@
         $scope.buyProducts =  function(){
             var URL = "/api/invoice";
             var jsondata =  {products: $scope.products};
-
+            console.log(JSON.stringify(jsondata));
             $http.post(URL, jsondata).
             success(function(data, status, headers, config) {
+                console.log(data);
                 $scope.lastInvoice = data;
-                $scope.invoices.push(data);
+                $scope.getInvoices();
+                
             }).
             error(function(data, status, headers, config) {
                 console.log("Error " + data + " " + status);
                 $scope.message = "There was an error creating the matrix";
             });
 
-
         };
 
-        $scope.generatePDF = function(index){
-            var invoice = $scope.invoices[index];
+        $scope.generatePDF = function(){
+            var invoice = $scope.lastInvoice;
             var bodyRows = [];
             bodyRows.push([ 'Name', 'Quantity', 'Price']);
             for(var i = 0;i < invoice.products.length;i++){
@@ -84,7 +114,7 @@
                 bodyRows.push(row);
             }
             bodyRows.push([ 'Subtotal','',invoice.subTotal]);
-            bodyRows.push([ 'Tax', '',invoice.totalTax]);
+            bodyRows.push([ 'Tax', '',invoice.taxTotal]);
             bodyRows.push([ 'Total','',invoice.total]);
             var docDefinition = {
               content: [

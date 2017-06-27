@@ -2,30 +2,45 @@
  * Created by USER on 13/04/2017.
  */
 
-var exchangeRateTable = {"COP$":{"COP$":1},"USD$":{"COP$":1.5},"MXN$":{"COP$":2}}
+var exchangeRateTable = {};
 var invoices = [];
 var IVA = 0.19;
-var COLOMBIANCURRENCY = "COP$";
+var COLOMBIANCURRENCY = "COP";
+
+var db = require('../persistence/InvoiceQueries');
+var dbExchangeRate = require('../persistence/ExchangeRateQueries');
 
 module.exports.createInvoice = function (req, res) {
-    console.log("Using service InvoiceService.createInvoice");
     try{
-        var data =  req.body.products;
-        var invoice = {code:invoices.length+1,date: Date.now(),products: data};
-        convertInvoice(invoice, COLOMBIANCURRENCY);
-        for(var i = 0;i<invoice.products.length;i++){
-            invoice.subTotal = calculateSubTotal(invoice.products);
-            invoice.totalTax = invoice.subTotal * IVA;
-            invoice.total = invoice.subTotal + invoice.totalTax;
-            invoice.currency = COLOMBIANCURRENCY;
-        }
-        invoices.push(invoice);
-        res.status(200).jsonp(invoice);
+        dbExchangeRate.getRates(function(rate){
+            exchangeRateTable = rate;
+            console.log("Using service InvoiceService.createInvoice");
+            convertInvoice(req.body, COLOMBIANCURRENCY);
+            req.body.subTotal = calculateSubTotal(req.body.products);
+            req.body.taxTotal = req.body.subTotal * IVA;
+            req.body.total = req.body.subTotal + req.body.taxTotal;
+            req.body.currency = COLOMBIANCURRENCY;
+            db.createInvoice(req.body, function (invoice) {
+                res.status(200).jsonp(invoice);    
+            });
+    });
+    }catch(err){
+        console.log(err.message);
+    } 
+};
+
+
+
+module.exports.getInvoices = function(req, res){
+    console.log("Using service InvoiceService.getInvoices");
+    try{
+        db.getInvoices(function(invoices){
+            res.status(200).jsonp(invoices);
+        });
     }catch(err){
         console.log(err.message);
     }
-};
-
+}
 
 
 function calculateSubTotal(products){

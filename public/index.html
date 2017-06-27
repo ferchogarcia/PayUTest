@@ -44,7 +44,7 @@
         <div class="col-md-8" >
 
 
-            <label for="user"> Producto: <select class="form-control" ng-model="product" id="user" ng-options="inventoryProduct.name as inventoryProduct.name for inventoryProduct in inventory " ng-change=getPriceProductSelected()>
+            <label for="user"> Producto: <select class="form-control" ng-model="code" id="user" ng-options="inventoryProduct.Code as inventoryProduct.Name for inventoryProduct in inventory " ng-change=getProductSelected()>
             </select>
             </label>
             <label for="quantity">Cantidad: <input class="form-control" ng-model="quantity" id="quantity" min="1" type="number"> </label>
@@ -54,7 +54,7 @@
             <ul >
                 <li ng-repeat=" product in products" >
                     Name: {{product.name}} , Quantity: {{product.quantity}}  Value:  {{product.value | currency: product.currency}}
-                    <button class="btn btn-default" ng-click="removeProduct(product.name)"><span class="glyphicon glyphicon-remove"></span> Remove</button>
+                    <button class="btn btn-default" ng-click="removeProduct(product.code)"><span class="glyphicon glyphicon-remove"></span> Remove</button>
                 </li>
             </ul>
              <button class="btn btn-default" ng-click="buyProducts()"><span class="glyphicon glyphicon-download"></span> Comprar</button>
@@ -100,7 +100,7 @@
                                 <tr>
                                     <td>Taxes</td>
                                     <td></td>
-                                    <td>{{lastInvoice.totalTax | currency: lastInvoice.currency}}</td>
+                                    <td>{{lastInvoice.taxTotal | currency: lastInvoice.currency}}</td>
                                 </tr>
                                 <!-- Total de la factura -->
                                 <tr class="active">
@@ -110,7 +110,7 @@
                                 </tr>
                             </tbody>
                         </table>
-                        <button class="btn btn-default" ng-click="generatePDF(invoices.length-1)"><span class="glyphicon glyphicon-upload"></span> Imprimir</button>
+                        <button class="btn btn-default" ng-click="generatePDF()"><span class="glyphicon glyphicon-upload"></span> Imprimir</button>
 
                     </div>
 
@@ -131,15 +131,13 @@
                                     <td>ID</td>
                                     <td>Date</td>
                                     <td>Total</td>
-                                    <td>Options</td>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr ng-repeat="invoice in invoices">
-                                    <td>{{invoice.code}}</td>
-                                    <td>{{invoice.date| date: "short"}}</td>
-                                    <td>{{invoice.total | currency: invoice.currency}}</td>
-                                    <td><button class="btn btn-default" ng-click="generatePDF($index)"><span class="glyphicon glyphicon-upload"></span> Imprimir</button></td>
+                                    <td>{{invoice.Code}}</td>
+                                    <td>{{invoice.Date| date: "short"}}</td>
+                                    <td>{{invoice.Total | currency: invoice.Currency}}</td>
                                 </tr>
                             </tbody>
                         </table>
