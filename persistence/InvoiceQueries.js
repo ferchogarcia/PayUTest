@@ -1,6 +1,9 @@
 
 var db = require('./config/db');
 
+/*
+* Inserta una nueva factura en la base de datos
+*/
 function createInvoice(invoice, fn){
 	console.log('Using InvoiceQueries.createInvoice');
     db.tx(function (t){
@@ -26,7 +29,9 @@ function createInvoice(invoice, fn){
     });;
 }
 
-
+/*
+* Obtiene la lista de facturas registradas
+*/
 function getInvoices(fn){
     console.log('Using InvoiceQueries.getInvoices');
     db.any('SELECT "Code", "Date", "Total" FROM "Invoice"', [])

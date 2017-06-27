@@ -26,7 +26,9 @@
         $scope.lastInvoice = null;
 
         
-
+        /*
+        *  obtiene la lista de productos disponibles a usar
+        */
         $scope.getProducts = function(){
             $http.get('/api/product').
             success(function(data, status, headers, config) {
@@ -38,7 +40,9 @@
             });
         };
         
-
+        /*
+        *  obtiene una lista de facturas registradas
+        */
         $scope.getInvoices = function(){
             $http.get('/api/invoice').
             success(function(data, status, headers, config) {
@@ -104,6 +108,9 @@
 
         };
 
+        /*
+        * Genera el pdf de la ultima factura generada
+        */
         $scope.generatePDF = function(){
             var invoice = $scope.lastInvoice;
             var bodyRows = [];

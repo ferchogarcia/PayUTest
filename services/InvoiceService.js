@@ -10,6 +10,9 @@ var COLOMBIANCURRENCY = "COP";
 var db = require('../persistence/InvoiceQueries');
 var dbExchangeRate = require('../persistence/ExchangeRateQueries');
 
+/*
+* Crea una factura a partir de productos de diferentes nacionalidades
+*/
 module.exports.createInvoice = function (req, res) {
     try{
         dbExchangeRate.getRates(function(rate){
@@ -30,7 +33,9 @@ module.exports.createInvoice = function (req, res) {
 };
 
 
-
+/*
+* Retorna las facturas registradas en el sistema
+*/
 module.exports.getInvoices = function(req, res){
     console.log("Using service InvoiceService.getInvoices");
     try{
@@ -42,7 +47,9 @@ module.exports.getInvoices = function(req, res){
     }
 }
 
-
+/*
+* calcula el subtotal de la factura de acuerdo a la cantidad y el precio
+*/
 function calculateSubTotal(products){
     var total = 0;
     for(var i = 0; i < products.length; i++){

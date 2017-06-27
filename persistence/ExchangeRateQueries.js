@@ -1,6 +1,9 @@
 
 var db = require('./config/db');
 
+/*
+* Obtiene una lista de tasas de cambio de monedas de diferentes naciones
+*/
 function getRates(fn){
 	console.log('Using ExchangeRateQueries.getRates');
 	db.any('SELECT "From", "To", "Rate" FROM "ExchangeRate"', [])
